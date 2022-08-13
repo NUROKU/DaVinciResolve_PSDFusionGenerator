@@ -10,9 +10,8 @@ PSDのFusionテンプレートを生成する
 DaVinciResolveのEditページ→エフェクトライブラリ→ジェネレーターにあるPSDをタイムラインにドラッグ＆ドロップするだけ。
 
 
-・3で作成されたテンプレートは下にあります。
-C:\ProgramData\Blackmagic Design\DaVinci Resolve\Fusion\Templates\Edit\Generators
+* 3で作成されたテンプレートはここに出力されます→ C:\ProgramData\Blackmagic Design\DaVinci Resolve\Fusion\Templates\Edit\Generators
 もしテンプレートを削除したい場合は直接ここにあるファイルを削除するだけ
 
-・形式的にDaVinciResolveのパワービンで保管できて使い回せるはず。
-・2で出力されたフォルダをいじったらテンプレートが使えなくなります
+* 形式的にDaVinciResolveのパワービンで保管できて使い回せるはず。
+* 2で出力されたフォルダをいじったらテンプレートが使えなくなります
