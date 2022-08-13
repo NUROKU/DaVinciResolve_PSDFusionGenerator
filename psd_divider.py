@@ -78,7 +78,7 @@ class PsdDivider:
             pil_img = Image.new("RGB", (1, 1), (0, 0, 0))
             pil_img.putalpha(0)
         pil_img.save(
-            output_folder_path + "/" + self.outputFolderName(layer) + str(self.png_serial_number) + ".png"
+            output_folder_path + "/" + self.outputFolderName(layer) + "-" + str(self.png_serial_number) + ".png"
         )
 
     def storeLayerInfo(self, layer, folder_path):
@@ -91,7 +91,7 @@ class PsdDivider:
             "layer_name": self.formatName(layer.name),
             "group": os.path.basename(folder_path),
             "default_visible": layer.is_visible(),
-            "file_path": folder_path + "/" + self.outputFolderName(layer) + str(self.png_serial_number) + ".png",
+            "file_path": folder_path + "/" + self.outputFolderName(layer) + "-" + str(self.png_serial_number) + ".png",
         }
         self.layer_info_dict[str(self.png_serial_number)] = layer_info
 
