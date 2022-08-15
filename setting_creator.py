@@ -1,5 +1,6 @@
 from itertools import groupby
 import json
+import os
 from template_const import TemplateConst
 
 class SettingCreator():
@@ -18,6 +19,7 @@ class SettingCreator():
         self.psd_original_dict = json.load(open(psdtool_folder + '/psd_original_info.json', 'r', encoding="utf-8_sig"))
         content = self.create_main_content()
         
+        os.makedirs(self.generator_macro_path, exist_ok=True)
         with open(f"{self.generator_macro_path}/{setting_file_name}.setting", 'w', encoding="utf-8") as f:
             f.write(content)
     
