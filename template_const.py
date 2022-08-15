@@ -29,8 +29,8 @@ class TemplateConst:
 					},'''
     INPUT_CONTENT_GROUP_PARTS = '''
 				%%%NODE_NAME%%% = InstanceInput {
-					SourceOp = "%%%SOURCE_NAME%%%",
-					Source = "group_label",
+					SourceOp = "Background1",
+					Source = "%%%SOURCE_GROUP_NAME%%%",
 					},'''
 
     LOADER_CONTENT_PARTS = '''
@@ -92,7 +92,19 @@ class TemplateConst:
 							TopLeftAlpha = Input { Value = 0, },
     					},
     					ViewInfo = OperatorInfo { Pos = { %%%NODE_POS_X%%%, %%%NODE_POS_Y%%% } },
+           					UserControls = ordered() {%%%LABEL_CONTENT%%%
+						},
     				},'''
+        
+    BACKGROUND_LABEL_CONTENT_PARTS = '''
+    							%%%GROUP_LABEL_NAME%%% = {
+								LINKS_Name = "%%%LAYER_PARENT_GROUP_NAME%%%",
+								LINKID_DataType = "Number",
+								INPID_InputControl = "LabelControl",
+								INP_Integer = false,
+								LBLC_DropDownButton = true,
+								LBLC_NumInputs = %%%LAYER_PARENT_NUM_INPUTS%%%,
+							},'''
 
     MERGE_CONTENT_PARTS = '''
     				%%%NODE_NAME%%% = Merge {
