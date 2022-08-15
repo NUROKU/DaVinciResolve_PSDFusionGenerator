@@ -41,6 +41,7 @@ class SettingCreator():
     def create_input_content(self):
         input_content = ""
         key_count = 0
+        # ここにラベルも作成するためのいろいろやるよ
         for key, group in groupby(self.psd_layer_dict, key=lambda m: m[1]['group']):
             replace_dict = {
                 "%%%NODE_NAME%%%": "",
@@ -55,7 +56,6 @@ class SettingCreator():
     def create_loader_content(self):
         def framerender_script(merge_node_name,max_val):
             return f"if self.image_selector < {max_val} then\\n    self.ClipTimeStart = self.image_selector\\n    self.ClipTimeEnd = self.image_selector\\n    index = self.image_selector + 1\\n    {merge_node_name}.Center.X = cft[index][1]\\n    {merge_node_name}.Center.Y = cft[index][2]\\nelse\\n    {merge_node_name}.Center.X = -1\\n    {merge_node_name}.Center.Y = -1\\nend"
-        # Parentが一致してるやつを
         loader_content = ""
         key_count = 0
         for key, group in groupby(self.psd_layer_dict, key=lambda m: m[1]['group']):
