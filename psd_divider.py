@@ -32,7 +32,7 @@ class PsdDivider:
                 is_exist_group = len([x for x in layer_ingroup if x.kind == "group"]) != 0
                 if (is_exist_group):
                     depend_group_len = len([x for x in layer_ingroup if x.kind == "group"])
-                    depend_group_name = layer.name
+                    depend_group_name = self.formatName(layer.name)
                     if (is_exist_clip):
                         depend_group_len = depend_group_len + 1
                     for group in [x for x in layer_ingroup if x.kind == "group"]:
