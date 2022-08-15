@@ -10,25 +10,25 @@ class SettingCreator():
     generator_macro_path = "C:/ProgramData/Blackmagic Design/DaVinci Resolve/Fusion/Templates/Edit/Generators"
 
     def execute(self,psdtool_folder:str,setting_file_name:str):
-        
+
         # psd_info読み込み
         self.psd_layer_dict = json.load(open(psdtool_folder + '/psd_layer_info.json', 'r', encoding="utf-8_sig"))
         self.psd_layer_dict = sorted(self.psd_layer_dict.items(), key=lambda x:int(x[0]))
         #self.psd_layer_dict = sorted(self.psd_layer_dict, key=lambda x:x[1]["level"])
-        
+
         self.psd_original_dict = json.load(open(psdtool_folder + '/psd_original_info.json', 'r', encoding="utf-8_sig"))
         content = self.create_main_content()
-        
+
         os.makedirs(self.generator_macro_path, exist_ok=True)
         with open(f"{self.generator_macro_path}/{setting_file_name}.setting", 'w', encoding="utf-8") as f:
             f.write(content)
-    
+
     def replace_words(self, original_text:str, replace_dict:dict):
         txt = original_text
         for re_from, re_to in replace_dict.items():
             txt = txt.replace(str(re_from), str(re_to))
         return txt
-        
+
     def create_main_content(self):
         replace_dict = {
             "%%%INPUT_CONTENT%%%": self.create_input_content(),
@@ -37,14 +37,26 @@ class SettingCreator():
             "%%%MEDIAOUT_CONTENT%%%": self.create_output_content(),
             "%%%MERGE_CONTENT%%%": self.create_merge_content()
         }
-        
+
         return self.replace_words(TemplateConst.MAIN_CONTENT,replace_dict)
-        
+
     def create_input_content(self):
         input_content = ""
         key_count = 0
-        # ここにラベルも作成するためのいろいろやるよ
+        group_label_count = 0
         for key, group in groupby(self.psd_layer_dict, key=lambda m: m[1]['group']):
+            group_list = list(group)
+            if (group_list[0][1]["depend_group_list"] is not []):
+                splited_group = group_list[0][1]["depend_group_list"]
+                for group in splited_group:
+                    group_label_count = group_label_count + 1
+                    # ネスト追加処理
+                    group_replace_dict = {
+                        "%%%NODE_NAME%%%": "nest_label" + str(group_label_count),
+                        "%%%SOURCE_GROUP_NAME%%%": "nest_label" + str(group_label_count),
+                    }
+                    input_content = input_content + self.replace_words(TemplateConst.INPUT_CONTENT_GROUP_PARTS,group_replace_dict)                
+
             replace_dict = {
                 "%%%NODE_NAME%%%": "",
                 "%%%SOURCE_NAME%%%": "",
@@ -52,11 +64,11 @@ class SettingCreator():
             key_count = key_count + 1
             replace_dict["%%%NODE_NAME%%%"] = "input" + str(key_count)
             replace_dict["%%%SOURCE_NAME%%%"] = "Loader" + str(key_count)
-            input_content = input_content + self.replace_words(TemplateConst.INPUT_CONTENT_PARTS,replace_dict)
+            input_content = input_content + self.replace_words(TemplateConst.INPUT_CONTENT_PARTS, replace_dict)
         return input_content
-    
+
     def create_loader_content(self):
-        def framerender_script(merge_node_name,max_val):
+        def framerender_script(merge_node_name, max_val):
             return f"if self.image_selector < {max_val} then\\n    self.ClipTimeStart = self.image_selector\\n    self.ClipTimeEnd = self.image_selector\\n    index = self.image_selector + 1\\n    {merge_node_name}.Center.X = cft[index][1]\\n    {merge_node_name}.Center.Y = cft[index][2]\\nelse\\n    {merge_node_name}.Center.X = -1\\n    {merge_node_name}.Center.Y = -1\\nend"
         loader_content = ""
         key_count = 0
@@ -110,20 +122,36 @@ class SettingCreator():
             replace_dict["%%%CSS_ADD_STRING_LIST%%%"] = replace_dict["%%%CSS_ADD_STRING_LIST%%%"] + "    							{ CCS_AddString = \"\" },"
             loader_content = loader_content + self.replace_words(TemplateConst.LOADER_CONTENT_PARTS,replace_dict)
         return loader_content
-    
+
     def create_background_content(self):
         replace_dict = {
             "%%%SIZE_WIDTH%%%": "",
             "%%%SIZE_HEIGHT%%%": "",
             "%%%NODE_POS_X%%%": 0,
             "%%%NODE_POS_Y%%%": 0,
+            "%%%LABEL_CONTENT%%%": ""
         }
         replace_dict["%%%SIZE_WIDTH%%%"] = str(self.psd_original_dict["original_psd_size_width"])
         replace_dict["%%%SIZE_HEIGHT%%%"] = str(self.psd_original_dict["original_psd_size_height"])
         replace_dict["%%%NODE_POS_X%%%"] = -110 
         replace_dict["%%%NODE_POS_Y%%%"] = 0
+
+        group_label_count = 0
+        for key, group in groupby(self.psd_layer_dict, key=lambda m: m[1]['group']):
+            group_list = list(group)
+            if (group_list[0][1]["depend_group_list"] is not []):
+                splited_group = group_list[0][1]["depend_group_list"]
+                for group in splited_group:
+                    group_label_count = group_label_count + 1
+                    label_replace_dict = {
+                        "%%%GROUP_LABEL_NAME%%%": "nest_label" + str(group_label_count),
+                        "%%%LAYER_PARENT_GROUP_NAME%%%": group[0],
+                        "%%%LAYER_PARENT_NUM_INPUTS%%%": group[1],
+                    }
+                    replace_dict["%%%LABEL_CONTENT%%%"] = replace_dict["%%%LABEL_CONTENT%%%"] + self.replace_words(TemplateConst.BACKGROUND_LABEL_CONTENT_PARTS,label_replace_dict)
+
         return self.replace_words(TemplateConst.BACKGROUND_CONTENT,replace_dict)
-    
+
     def create_merge_content(self):
         merge_content = ""
         replace_dict = {
