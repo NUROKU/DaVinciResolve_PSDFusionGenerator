@@ -89,6 +89,7 @@ class TemplateConst:
     						Width = Input { Value = %%%SIZE_WIDTH%%%, },
     						Height = Input { Value = %%%SIZE_HEIGHT%%%, },
     						["Gamut.SLogVersion"] = Input { Value = FuID { "SLog2" }, },
+							TopLeftAlpha = Input { Value = 0, },
     					},
     					ViewInfo = OperatorInfo { Pos = { %%%NODE_POS_X%%%, %%%NODE_POS_Y%%% } },
     				},'''
