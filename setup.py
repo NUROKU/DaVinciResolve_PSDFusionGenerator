@@ -8,7 +8,7 @@ packages = []
 includes = ["re", "os", "psd_tools", "json"]
 excludes = ["PyQt4", "PyQt5"]
 
-my_exe = Executable(script="main.py", base=base)
+my_exe = Executable(script="PSDFusionGenerator/PSDFusionGenerator.py", base=base)
 
 setup(
     name="DaVinciResolve_PSDFusionGenerator",
