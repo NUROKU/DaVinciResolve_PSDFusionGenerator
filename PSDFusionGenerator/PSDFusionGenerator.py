@@ -1,8 +1,8 @@
 import os
 from tkinter import filedialog, messagebox
 import traceback
-from psd_divider import PsdDivider
-from setting_creator import SettingCreator
+from PSDDivider.psd_divider import PsdDivider
+from SettingCreator.setting_creator import SettingCreator
 import tkinter as tk
 
 def __main__():
