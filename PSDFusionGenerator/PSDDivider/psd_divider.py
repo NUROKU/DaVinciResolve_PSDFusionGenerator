@@ -1,6 +1,7 @@
 import os
 import re
 import json
+from Common import common_lib
 from psd_tools import PSDImage
 from datetime import datetime as dt
 from PIL import Image
@@ -21,17 +22,17 @@ class PsdDivider:
 
         psd = PSDImage.open(psd_file_path, encoding=encoding)
 
-        # psd_list = reversed(list(psd.descendants(include_clip=False)))
         depend_group_list = []
         for layer in list(psd.descendants(include_clip=False)):
             if (layer.is_group()):
-                # inputのラベル生成用の処理
+                # inputのネスト用ラベル生成用、PSDグループの下にPSDグループが存在する場合に親グループ情報保存
                 layer_ingroup = list(layer.descendants(include_clip=False))
                 is_exist_clip = len([x for x in layer_ingroup if x.kind == "pixel" and x.parent is layer]) != 0
                 is_exist_group = len([x for x in layer_ingroup if x.kind == "group"]) != 0
                 if (is_exist_group):
                     depend_group_len = len([x for x in layer_ingroup if x.kind == "group"])
-                    depend_group_name = self.format_name(layer.name)
+                    depend_group_name = common_lib.format_name(layer.name)
+                    # レイヤーの有無等で属するグループ数が変わってくるので色々
                     if (is_exist_clip):
                         depend_group_len = depend_group_len + 1
                     for group in [x for x in layer_ingroup if x.kind == "group"]:
@@ -51,34 +52,21 @@ class PsdDivider:
         self.output_info_json_file(output_folder_path)
         return output_folder_path
 
-    def format_name(self, text: str):
-        # 文字化け対応
-        text = text.encode("utf-16", "surrogatepass").decode("utf-16")
-
-        # フォルダ作成時の禁止用語コンバート
-        text = re.sub(r'[\\/:*?"<>| ]+', "_", text)
-        text = text.replace("\x00", "")
-        if text == "":
-            text = "_"
-        return text
-
     def output_folder_name(self, layer):
-        name = self.format_name(layer.parent.name)
-        # self.folder_serial_number = self.folder_serial_number + 1
+        name = common_lib.format_name(layer.parent.name)
         if (layer.parent.parent is not None):
             if (layer.parent.parent.is_group()):
-                name = self.format_name(layer.parent.parent.name) + "_" + name
+                name = common_lib.format_name(layer.parent.parent.name) + "_" + name
             else:
                 name = "Root_" + name
         else:
             # 一番上に画像置いてある場合の処理
-            name = "_" + self.format_name(layer.name)
+            name = "_" + common_lib.format_name(layer.name)
         return name
 
     def save_png(self, layer, output_folder_path):
         pil_img = layer.topil()
         os.makedirs(output_folder_path, exist_ok=True)
-        # ここに画像サイズ縮小処理とか入れれそう、いれてないけど
         self.png_serial_number = self.png_serial_number + 1
         if pil_img is None:
             # 0*0画像?で「選択無」パラメータ用意してくれてる立ち絵製作者さんのために
@@ -95,8 +83,8 @@ class PsdDivider:
             "size_height": layer.size[1],
             "offset_x": layer.offset[0],
             "offset_y": layer.offset[1],
-            "layer_name": self.format_name(layer.name),
-            "group": self.format_name(layer.parent.name) if layer.parent.parent is not None else os.path.basename(folder_path),
+            "layer_name": common_lib.format_name(layer.name),
+            "group": common_lib.format_name(layer.parent.name) if layer.parent.parent is not None else os.path.basename(folder_path),
             "group_folder": os.path.basename(folder_path),
             "default_visible": layer.is_visible(),
             "file_path": folder_path + "/" + self.output_folder_name(layer) + "-" + str(self.png_serial_number) + ".png",
@@ -130,11 +118,5 @@ class PsdDivider:
 
     def output_info_json_file(self, output_folder_path):
         # 出力するだけ
-        with open(
-            output_folder_path + "/psd_layer_info.json", "w", encoding="utf-8_sig"
-        ) as f:
-            json.dump(self.layer_info_dict, f, indent=2, ensure_ascii=False)
-        with open(
-            output_folder_path + "/psd_original_info.json", "w", encoding="utf-8_sig"
-        ) as f:
-            json.dump(self.original_info_dict, f, indent=2, ensure_ascii=False)
+        common_lib.output_json(output_folder_path + "/psd_layer_info.json", self.layer_info_dict)
+        common_lib.output_json(output_folder_path + "/psd_original_info.json", self.original_info_dict)
