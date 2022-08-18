@@ -1,7 +1,7 @@
 import os
 import re
 import json
-from Common import common_lib
+from PSDFusionGenerator.Common import common_lib
 from psd_tools import PSDImage
 from datetime import datetime as dt
 from PIL import Image
