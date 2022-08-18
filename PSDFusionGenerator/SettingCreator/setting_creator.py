@@ -9,12 +9,18 @@ class SettingCreator():
     psd_original_dict = None
     generator_macro_path = "C:/ProgramData/Blackmagic Design/DaVinci Resolve/Fusion/Templates/Edit/Generators"
 
-    def execute(self,psdtool_folder:str,setting_file_name:str):
+    # 1. template_constから作成する.settingの変換前文字列取得
+    # 2. 置換したい変換前の文字:変換後の文字 のdict作成
+    # 3. replace_wordsで変換
+    # という流れをMergeノードLoaderノードetc...全部でやってる。
+    # 正直Base_settingみたいな基底クラス作って継承クラスinput_setting,merge_setting...って対応した方がいいと思う
+    # 気が向けれたらやる
+
+    def execute(self, psdtool_folder:str, setting_file_name:str):
 
         # psd_info読み込み
         self.psd_layer_dict = json.load(open(psdtool_folder + '/psd_layer_info.json', 'r', encoding="utf-8_sig"))
         self.psd_layer_dict = sorted(self.psd_layer_dict.items(), key=lambda x:int(x[0]))
-        #self.psd_layer_dict = sorted(self.psd_layer_dict, key=lambda x:x[1]["level"])
 
         self.psd_original_dict = json.load(open(psdtool_folder + '/psd_original_info.json', 'r', encoding="utf-8_sig"))
         content = self.create_main_content()
@@ -23,7 +29,7 @@ class SettingCreator():
         with open(f"{self.generator_macro_path}/{setting_file_name}.setting", 'w', encoding="utf-8") as f:
             f.write(content)
 
-    def replace_words(self, original_text:str, replace_dict:dict):
+    def replace_words(self, original_text: str, replace_dict: dict):
         txt = original_text
         for re_from, re_to in replace_dict.items():
             txt = txt.replace(str(re_from), str(re_to))
@@ -175,7 +181,7 @@ class SettingCreator():
             merge_content = merge_content + self.replace_words(TemplateConst.MERGE_CONTENT_PARTS,replace_dict)
 
         return merge_content
-    
+
     def create_output_content(self):
         replace_dict = {
             "%%%SOURCE_OP%%%": "",
