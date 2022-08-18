@@ -15,16 +15,16 @@ def __main__():
     output_folder_path = os.path.dirname(psd_file_path)
     generator_name = os.path.splitext(os.path.basename(psd_file_path))[0]
 
-#    try:
-    print("PSDFusionGeneratorを開始します。")
-    print("PSDを解析中です。（これには数十秒かかる場合があります）")
-    psd_divider = PsdDivider()
-    created_folder = psd_divider.execute(psd_file_path, output_folder_path)
-    print("settingファイルを作成中です")
-    setting_creator = SettingCreator()
-    setting_creator.execute(created_folder,generator_name)
-    messagebox.showinfo("報告", "DaVinciResolveに取り込めました。\nEditページ→エフェクト→ジェネレーター→Fusionジェネレーターにあります")
-#    except Exception as e:
-#        messagebox.showerror("エラー", "DavinciResolveに取り込めませんでした。\n" + traceback.format_exc())
+    try:
+        print("PSDFusionGeneratorを開始します。")
+        print("PSDを解析中です。（これには数十秒かかる場合があります）")
+        psd_divider = PsdDivider()
+        created_folder = psd_divider.execute(psd_file_path, output_folder_path)
+        print("settingファイルを作成中です")
+        setting_creator = SettingCreator()
+        setting_creator.execute(created_folder,generator_name)
+        messagebox.showinfo("報告", "DaVinciResolveに取り込めました。\nEditページ→エフェクト→ジェネレーター→Fusionジェネレーターにあります")
+    except Exception as e:
+        messagebox.showerror("エラー", "DavinciResolveに取り込めませんでした。\n" + traceback.format_exc())
 
 __main__()
