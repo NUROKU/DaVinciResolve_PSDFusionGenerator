@@ -1,7 +1,7 @@
 from itertools import groupby
 import json
 import os
-from SettingCreator.template_const import TemplateConst
+from PSDFusionGenerator.SettingCreator.template_const import TemplateConst
 
 class SettingCreator():
 
